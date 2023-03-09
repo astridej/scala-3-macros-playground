@@ -3,6 +3,9 @@ package testing
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
 
+import java.nio.charset.StandardCharsets
+import javax.crypto.Cipher
+
 class InspectTest extends AnyFreeSpec with Matchers {
   "Inspecting code should work" in {
     case class Test(value: Int)
@@ -86,4 +89,34 @@ class InspectTest extends AnyFreeSpec with Matchers {
     compilerFibonacci(7) shouldBe 13
     inspectRuntime(compilerFibonacci(10))._2 shouldBe "(55: scala.Int)"
   }
+
+//  "Parsing RSA key" - {
+//    "should parse valid combo" in {
+//      val (privateKey, publicKey) = genRsa(
+//        "12539148542921766920072558173291142484902105492704636781351392734744057399437641401934727252468605704860138265892934102958359578345275306778785598166055587:11421375507475397001018717347607843674458520043035821313823406290148379958738206228816764663886904242391219416681217623642535942288500848547847771003173177:65537"
+//      )
+//      val encryptCipher = Cipher.getInstance("RSA")
+//      encryptCipher.init(Cipher.ENCRYPT_MODE, publicKey)
+//      val decryptCipher = Cipher.getInstance("RSA")
+//      decryptCipher.init(Cipher.DECRYPT_MODE, privateKey)
+//      val secretiveSecret = "I am such a secret message"
+//      val encrypted       = encryptCipher.doFinal(secretiveSecret.getBytes(StandardCharsets.UTF_8))
+//      val decrypted       = new String(decryptCipher.doFinal(encrypted), StandardCharsets.UTF_8)
+//      decrypted shouldBe secretiveSecret
+//    }
+//  }
+  "We can get the compilation time and git commit" in {
+    println(buildInfo())
+  }
+
+  "The unwisest frog" - {
+    "can check the weather" in {
+      "unwiseWeatherFrog" shouldNot compile
+    }
+  }
+
+//  "Can derive an Eq instance for a case class" in {
+//    case class Test(int: Int)
+//    deriveEq[Test]
+//  }
 }
