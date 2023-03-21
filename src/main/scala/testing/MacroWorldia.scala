@@ -78,44 +78,6 @@ def unwiseWeatherFrogCode()(using quotes: Quotes): Expr[WeatherInfo] = {
   }
 }
 
-//def genRsaCode(textExpr: Expr[String])(
-//    using quotes: Quotes
-//): Expr[(PrivateKey, PublicKey)] = {
-//  import quotes.reflect.report.errorAndAbort
-//  val (rawPrimeOne, rawPrimeTwo, rawPublicExp) = textExpr.valueOrAbort.split(":").toList match {
-//    case rawOne :: rawTwo :: rawPub :: Nil => (rawOne, rawTwo, rawPub)
-//    case _ =>
-//      errorAndAbort(
-//        s"Invalid format for RSA private key! Expected two primes and public exponent in that order",
-//        textExpr
-//      )
-//  }
-//  val primeOne       = BigInt(rawPrimeOne, 10)
-//  val primeTwo       = BigInt(rawPrimeTwo, 10)
-//  val publicExponent = BigInt(rawPublicExp)
-//  // sanity check
-//  if (!primeOne.isProbablePrime(5))
-//    errorAndAbort("First provided number is not prime!", textExpr)
-//  if (!primeTwo.isProbablePrime(5))
-//    errorAndAbort("Second provided number is not prime!", textExpr)
-//
-//  val modulus = primeOne * primeTwo
-//  val phi     = (primeOne - 1) * (primeTwo - 1)
-//
-//  if (phi.mod(publicExponent) == 0)
-//    errorAndAbort("Public exponent divides phi, no private exponent can exist.", textExpr)
-//  val privateExponent = phi.modInverse(publicExponent)
-//
-//  '{
-//    val privateKeySpec = new RSAPrivateKeySpec(${ Expr(modulus) }.bigInteger, ${ Expr(privateExponent) }.bigInteger)
-//    val publicKeySpec  = new RSAPublicKeySpec(${ Expr(modulus) }.bigInteger, ${ Expr(publicExponent) }.bigInteger)
-//    val keyFactory     = KeyFactory.getInstance("RSA")
-//    val privateKey     = keyFactory.generatePrivate(privateKeySpec)
-//    val publicKey      = keyFactory.generatePublic(publicKeySpec)
-//    (privateKey, publicKey)
-//  }
-//}
-
 def inspectTypeReprCode[T: Type](using Quotes): Expr[String] = {
   import quotes.reflect.*
   val repr = TypeRepr.of[T]
@@ -130,6 +92,7 @@ def deriveEqCode[T: Type](using Quotes): Expr[Eq[T]] = {
   val fieldCheckEqs: List[(Expr[T], Expr[T]) => Expr[Boolean]] = sym.caseFields.map { field =>
     val fieldType = TypeRepr.of[T].memberType(field)
     fieldType.asType match {
+      // TODO get this to support higher-kinded types... :(
       case '[t] =>
         val eq =
           Expr.summon[Eq[t]].getOrElse(quotes.reflect.report.errorAndAbort(s"Could not find implicit for field $field"))

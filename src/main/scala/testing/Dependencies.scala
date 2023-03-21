@@ -59,17 +59,3 @@ object Eq {
       case _                                                       => false
     }
 }
-
-trait Encoder[C] {
-  def encode(c: C): String
-}
-
-trait HasCanonicalRepr[C] {
-  def canonical(): C
-}
-
-object HasCanonicalRepr {
-  given HasCanonicalRepr[String]                               = () => ""
-  given list[T]: HasCanonicalRepr[List[T]]                     = () => List.empty
-  given numeric[N](using num: Numeric[N]): HasCanonicalRepr[N] = () => num.zero
-}
