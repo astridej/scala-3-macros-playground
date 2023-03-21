@@ -148,5 +148,14 @@ class InspectTest extends AnyFreeSpec with Matchers {
   "Can also derive an Eq instance for a case class via mirrors" in {
     case class Test(int: Int)
     val eq = MirrorUniverse.deriveEqMirrored[Test]
+    eq.areEqual(Test(3), Test(4)) shouldBe false
+    eq.areEqual(Test(3), Test(3)) shouldBe true
+
+  }
+
+  "Can do a DNS lookup at compile time via string interpolation, because why not" in {
+    val address = dnsResolve"google.com"
+    println(address.asIpv4)
+
   }
 }

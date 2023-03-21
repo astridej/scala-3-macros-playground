@@ -2,12 +2,14 @@ package testing
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
+import com.comcast.ip4s.IpAddress
 import dotty.tools.dotc.semanticdb.SymbolInformation.Kind.PACKAGE
 import org.http4s.ember.client.EmberClientBuilder
 import org.http4s.circe.CirceInstances.*
 import org.http4s.circe.CirceEntityDecoder.*
 
 import java.io.File
+import java.net.InetAddress
 import java.nio.file.Files
 import java.security.{KeyFactory, PrivateKey, PublicKey}
 import java.security.spec.{RSAPrivateKeySpec, RSAPublicKeySpec}
@@ -110,5 +112,16 @@ def deriveEqCode[T: Type](using Quotes): Expr[Eq[T]] = {
           .foldRight('true)((a, b) => '{ $a && $b })
       }
     }
+  }
+}
+
+def dnsResolveCode(in: Expr[StringContext], args: Expr[Seq[Any]])(using Quotes): Expr[IpAddress] = {
+  val context = in.valueOrAbort.parts
+  if (context.size != 1) {
+    quoted.quotes.reflect.report.errorAndAbort("Interpolation not supported!")
+  } else {
+    val ip = InetAddress.getByName(context.head).getHostAddress
+    IpAddress.fromString(ip).getOrElse(quoted.quotes.reflect.report.errorAndAbort("Problem resolving host address."))
+    '{ IpAddress.fromString(${ Expr(ip) }).get }
   }
 }

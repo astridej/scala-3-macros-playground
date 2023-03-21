@@ -1,5 +1,7 @@
 package testing
 
+import com.comcast.ip4s.IpAddress
+
 import java.security.{PrivateKey, PublicKey}
 import java.time.Instant
 
@@ -22,3 +24,7 @@ inline def inspectTypeRepr[T](): String = ${ inspectTypeReprCode[T] }
 inline def unwiseWeatherFrog: WeatherInfo = ${ unwiseWeatherFrogCode() }
 
 inline def deriveEq[T]: Eq[T] = ${ deriveEqCode[T] }
+
+extension (inline sc: StringContext) {
+  inline def dnsResolve(args: Any*): IpAddress = ${ dnsResolveCode('sc, 'args) }
+}
