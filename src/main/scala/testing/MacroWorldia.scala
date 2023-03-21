@@ -27,6 +27,11 @@ def inspectCodeTyped[T](x: Expr[T])(using Type[T], Quotes): Expr[T] = {
 def inspectCodeRuntime[T](x: Expr[T])(using Type[T], Quotes): Expr[(String, String)] =
   Expr((Type.show[T], x.show))
 
+def inspectTreeCodeRuntime[T](x: Expr[T])(using Type[T], Quotes): Expr[String] = {
+  import quotes.reflect.*
+  Expr(x.asTerm.show(using Printer.TreeStructure))
+}
+
 def plusStaticCode(x: Expr[Int], y: Expr[Int])(using Quotes): Expr[Int] =
   Expr(x.valueOrAbort + y.valueOrAbort)
 
@@ -117,20 +122,30 @@ def inspectTypeReprCode[T: Type](using Quotes): Expr[String] = {
   Expr(repr.show)
 }
 
-//def deriveEqCode[T: Type](using Quotes): Expr[Eq[T]] = {
-//  import quotes.reflect.*
-//  val sym = TypeRepr.of[T].typeSymbol
-//  if (!sym.isClassDef || !sym.flags.is(Flags.Case))
-//    quotes.reflect.report.errorAndAbort("Not a case class.")
-//  val typeRefs = sym.caseFields.map { field =>
-//    val fieldType = TypeRepr.of[T].memberType(field)
-//    Implicits.search(TypeRepr.of[Eq[Int]]) match {
-//      case success: ImplicitSearchSuccess =>
-//        println(success)
-//      case failure: ImplicitSearchFailure =>
-//        println(failure)
-//    }
-//
-//  }
-//  ???
-//}
+def deriveEqCode[T: Type](using Quotes): Expr[Eq[T]] = {
+  import quotes.reflect.*
+  val sym = TypeRepr.of[T].typeSymbol
+  if (!sym.isClassDef || !sym.flags.is(Flags.Case))
+    quotes.reflect.report.errorAndAbort("Not a case class.")
+  val fieldCheckEqs: List[(Expr[T], Expr[T]) => Expr[Boolean]] = sym.caseFields.map { field =>
+    val fieldType = TypeRepr.of[T].memberType(field)
+    fieldType.asType match {
+      case '[t] =>
+        val eq =
+          Expr.summon[Eq[t]].getOrElse(quotes.reflect.report.errorAndAbort(s"Could not find implicit for field $field"))
+        (s: Expr[T], t: Expr[T]) =>
+          '{ ${ eq }.areEqual(${ Select(s.asTerm, field).asExprOf[t] }, ${ Select(t.asTerm, field).asExprOf[t] }) }
+    }
+  }
+  '{
+    new Eq[T] {
+      override def areEqual(c: T, d: T): Boolean = ${
+        fieldCheckEqs
+          .map { fn =>
+            fn('c, 'd)
+          }
+          .foldRight('true)((a, b) => '{ $a && $b })
+      }
+    }
+  }
+}

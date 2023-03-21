@@ -45,7 +45,7 @@ object BuildInfo {
 }
 
 trait Eq[-C] {
-  def equals(c: C, d: C): Boolean
+  def areEqual(c: C, d: C): Boolean
 }
 
 object Eq {
@@ -54,9 +54,9 @@ object Eq {
   given Eq[Boolean]                              = (c, d) => c == d
   given coll[C](using eq: Eq[C]): Eq[Iterable[C]] = (c: Iterable[C], d: Iterable[C]) =>
     (c.headOption, d.headOption) match {
-      case (None, None)                                          => true
-      case (Some(chead), Some(dhead)) if eq.equals(chead, dhead) => this.equals(c.tail, d.tail)
-      case _                                                     => false
+      case (None, None)                                            => true
+      case (Some(chead), Some(dhead)) if eq.areEqual(chead, dhead) => this.equals(c.tail, d.tail)
+      case _                                                       => false
     }
 }
 

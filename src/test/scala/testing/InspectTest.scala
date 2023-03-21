@@ -42,14 +42,17 @@ class InspectTest extends AnyFreeSpec with Matchers {
     inspectRuntime(15) shouldBe ("scala.Int", "15")
     inspectRuntime("Look at me I'm a string!") shouldBe ("java.lang.String", "\"Look at me I\\'m a string!\"")
     inspectRuntime(23 - 15) shouldBe ("scala.Int", "8") // scala compiler optimization??
+    def indirectAddition(a: Int, b: Int): Int = a + b
+    inspectRuntime(indirectAddition(1, 1)) shouldBe ("scala.Int", "indirectAddition(1, 1)")
     inspectRuntime {
       // chosen to be random by secure dice roll
       def random(): Int = 4
       random()
-    } shouldBe ("scala.Int", """{
-                                   |  def random(): scala.Int = 4
-                                   |  random()
-                                   |}""".stripMargin)
+    } shouldBe ("scala.Int",
+    """{
+       |  def random(): scala.Int = 4
+       |  random()
+       |}""".stripMargin)
     val x = 5
     inspectRuntime(x) shouldBe ("scala.Int", "x")
     inspectRuntime(Test(42)) shouldBe ("Test", "Test.apply(42)")
@@ -115,8 +118,35 @@ class InspectTest extends AnyFreeSpec with Matchers {
     }
   }
 
-//  "Can derive an Eq instance for a case class" in {
-//    case class Test(int: Int)
-//    deriveEq[Test]
-//  }
+  "Can check out syntax trees" in {
+    case class Test(value: Int)
+    inspectTreeRuntime(15) shouldBe ("Inlined(None, Nil, Literal(IntConstant(15)))")
+
+    def indirectAddition(a: Int, b: Int): Int = a + b
+
+    inspectTreeRuntime(
+      indirectAddition(1, 1)
+    ) shouldBe ("Inlined(None, Nil, Apply(Ident(\"indirectAddition\"), List(Literal(IntConstant(1)), Literal(IntConstant(1)))))")
+    val x = 5
+    inspectTreeRuntime(x) shouldBe ("Inlined(None, Nil, Ident(\"x\"))")
+    inspectTreeRuntime(
+      Test(42)
+    ) shouldBe ("Inlined(None, Nil, Apply(Select(Ident(\"Test\"), \"apply\"), List(Literal(IntConstant(42)))))")
+
+    inspectTreeRuntime((x: Test) =>
+      x.value
+    ) shouldBe "Inlined(None, Nil, Block(List(DefDef(\"$anonfun\", List(TermParamClause(List(ValDef(\"x\", TypeIdent(\"Test\"), None)))), Inferred(), Some(Select(Ident(\"x\"), \"value\")))), Closure(Ident(\"$anonfun\"), None)))"
+  }
+
+  "Can derive an Eq instance for a case class" in {
+    case class Test(int: Int)
+    val eq = deriveEq[Test]
+    eq.areEqual(Test(3), Test(4)) shouldBe false
+    eq.areEqual(Test(3), Test(3)) shouldBe true
+  }
+
+  "Can also derive an Eq instance for a case class via mirrors" in {
+    case class Test(int: Int)
+    val eq = MirrorUniverse.deriveEqMirrored[Test]
+  }
 }
