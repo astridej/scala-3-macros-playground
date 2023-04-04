@@ -1,5 +1,12 @@
 package testing
 
+import cats.effect.IO
+import cats.effect.unsafe.implicits.global
+import org.http4s.ember.client.EmberClientBuilder
+import org.http4s.circe.CirceInstances.*
+import org.http4s.circe.CirceEntityDecoder.*
+
+import java.io.File
 import java.time.Instant
 import scala.quoted.{Expr, Quotes, ToExpr}
 
@@ -33,7 +40,31 @@ case class OpenMeteoResponse(daily: OpenMetoDailyResponse) derives io.circe.Code
   )
 }
 
+def unwiseWeatherFrogCode()(using quotes: Quotes): Expr[WeatherInfo] = {
+  // 🐸
+  val weatherInfo =
+    EmberClientBuilder
+      .default[IO]
+      .build
+      .use { client =>
+        client
+          .expect[OpenMeteoResponse](
+            "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Europe%2FBerlin"
+          )
+          .map(_.toWeatherInfo)
+      }
+      .unsafeRunSync()
+  weatherInfo.complaint match {
+    case Some(complaint) =>
+      quotes.reflect.report.errorAndAbort(s"The weather is bad because $complaint, so the compiler is sulking.")
+    case None =>
+      println("The weather is good, the compiler can continue working!")
+      Expr(weatherInfo)
+  }
+}
+
 case class BuildInfo(time: Instant, gitCommit: String)
+
 object BuildInfo {
   given ToExpr[BuildInfo] = new ToExpr[BuildInfo]:
     override def apply(x: BuildInfo)(using Quotes): Expr[BuildInfo] = '{
@@ -44,18 +75,10 @@ object BuildInfo {
     }
 }
 
-trait Eq[-C] {
-  def areEqual(c: C, d: C): Boolean
-}
-
-object Eq {
-  given numeric[N](using num: Numeric[N]): Eq[N] = (c, d) => num.equiv(c, d)
-  given Eq[String]                               = (c, d) => c == d
-  given Eq[Boolean]                              = (c, d) => c == d
-  given coll[C](using eq: Eq[C]): Eq[Iterable[C]] = (c: Iterable[C], d: Iterable[C]) =>
-    (c.headOption, d.headOption) match {
-      case (None, None)                                            => true
-      case (Some(chead), Some(dhead)) if eq.areEqual(chead, dhead) => this.equals(c.tail, d.tail)
-      case _                                                       => false
-    }
+def buildInfoCode()(using quotes: Quotes): Expr[BuildInfo] = {
+  import sys.process.*
+  val now                 = Instant.now()
+  val currentFileLocation = quotes.reflect.Position.ofMacroExpansion.sourceFile.jpath
+  val process = Process("git rev-parse HEAD", new File(currentFileLocation.getParent().toAbsolutePath().toString))
+  Expr(BuildInfo(now, process.!!))
 }

@@ -23,3 +23,4 @@ libraryDependencies += "org.typelevel" %% "cats-effect" % "3.4.8"
 // https://mvnrepository.com/artifact/io.circe/circe-core
 libraryDependencies += "io.circe" %% "circe-core"    % "0.15.0-M1"
 libraryDependencies += "io.circe" %% "circe-generic" % "0.15.0-M1"
+libraryDependencies += "io.circe" %% "circe-parser"  % "0.15.0-M1"
