@@ -3,11 +3,11 @@ import cats.syntax.all.*
 
 import scala.quoted.*
 
+// Example of a custom string literal that supports interpolation: let's try to parse first-order propositional logic
 def propositionCode(sc: Expr[StringContext], args: Expr[Seq[Proposition]])(using Quotes): Expr[Proposition] = {
   import quoted.quotes.*
   import quotes.reflect.report
   def parsePartial(next: List[String | Expr[Proposition]]): Expr[Proposition] =
-//    println(s"Attempting to parse $next")
     next match {
       case Nil                              => report.errorAndAbort("Got empty statement when parsing proposition!")
       case (expr: Expr[Proposition]) :: Nil => expr
@@ -46,9 +46,8 @@ def propositionCode(sc: Expr[StringContext], args: Expr[Seq[Proposition]])(using
 
   val context = sc.valueOrAbort
   def clean(list: List[String]): List[String] =
-    // TODO figure out how to handle lack of whitespace :(
     list
-      .flatMap( // hacky mchackville to group the raw input correctly
+      .flatMap( // hack to group the raw input correctly
         _.replaceAll(raw"(!|\(|\)|\)|&&|=>|->|\|\|)", " $1 ")
           .split(" ")
       )

@@ -24,6 +24,8 @@ object Eq {
   }
 }
 
+// We can use macros to try to derive an Eq instance for a case class
+// this requires dipping into the reflect API and creating some expressions via the actual syntax trees, which is pretty ugly
 def deriveEqCode[T: Type](using Quotes): Expr[Eq[T]] = {
   import quotes.reflect.*
   val sym = TypeRepr.of[T].typeSymbol
@@ -32,7 +34,6 @@ def deriveEqCode[T: Type](using Quotes): Expr[Eq[T]] = {
   val fieldCheckEqs: List[(Expr[T], Expr[T]) => Expr[Boolean]] = sym.caseFields.map { field =>
     val fieldType = TypeRepr.of[T].memberType(field)
     fieldType.asType match {
-      // TODO get this to support higher-kinded types... :(
       case '[t] =>
         val eq =
           Expr.summon[Eq[t]].getOrElse(quotes.reflect.report.errorAndAbort(s"Could not find implicit for field $field"))
@@ -53,6 +54,8 @@ def deriveEqCode[T: Type](using Quotes): Expr[Eq[T]] = {
   }
 }
 
+// We can also use inline and Mirror to derive Eq instances
+// Significantly simpler and more elegant, and can be shortened even more via Shapeless
 object MirrorUniverse {
   given Eq[EmptyTuple.type] = (_: EmptyTuple.type, _: EmptyTuple.type) => true
 

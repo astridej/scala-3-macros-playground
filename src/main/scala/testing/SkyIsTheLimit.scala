@@ -19,6 +19,8 @@ case class WeatherInfo(high: Int, low: Int, rainChance: Double) {
 }
 
 object WeatherInfo {
+  // ToExpr typeclass allows "transferring" instances of types between compile-time and runtime
+  // by explaining how to construct an expression that will recreate the value
   given ToExpr[WeatherInfo] = new ToExpr[WeatherInfo]:
     override def apply(x: WeatherInfo)(using Quotes): Expr[WeatherInfo] = '{
       WeatherInfo(${ Expr(x.high) }, ${ Expr(x.low) }, ${ Expr(x.rainChance) })
@@ -40,6 +42,8 @@ case class OpenMeteoResponse(daily: OpenMetoDailyResponse) derives io.circe.Code
   )
 }
 
+// you can run pretty much any code during compilation, and cause custom errors
+// i.e. you COULD do the following (but really shouldn't)
 def unwiseWeatherFrogCode()(using quotes: Quotes): Expr[WeatherInfo] = {
   // 🐸
   val weatherInfo =
@@ -53,7 +57,7 @@ def unwiseWeatherFrogCode()(using quotes: Quotes): Expr[WeatherInfo] = {
           )
           .map(_.toWeatherInfo)
       }
-      .unsafeRunSync()
+      .unsafeRunSync() // usually I would say unsafeRunSync is a sign you are doing something wrong, but here there are so many other problems with what we're doing already
   weatherInfo.complaint match {
     case Some(complaint) =>
       quotes.reflect.report.errorAndAbort(s"The weather is bad because $complaint, so the compiler is sulking.")
@@ -65,6 +69,7 @@ def unwiseWeatherFrogCode()(using quotes: Quotes): Expr[WeatherInfo] = {
 
 case class BuildInfo(time: Instant, gitCommit: String)
 
+// a significantly more reasonable example: you could extract build time and git commit hash during compilation
 object BuildInfo {
   given ToExpr[BuildInfo] = new ToExpr[BuildInfo]:
     override def apply(x: BuildInfo)(using Quotes): Expr[BuildInfo] = '{

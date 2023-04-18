@@ -12,6 +12,7 @@ import java.security.spec.{RSAPrivateKeySpec, RSAPublicKeySpec}
 import java.time.Instant
 import scala.quoted.*
 
+// use string literals to parse binary numbers via macro
 def binaryCode(in: Expr[StringContext], args: Expr[Seq[Any]])(using Quotes): Expr[Int] = {
   val context = in.valueOrAbort.parts
   if (context.size != 1) {
@@ -21,6 +22,7 @@ def binaryCode(in: Expr[StringContext], args: Expr[Seq[Any]])(using Quotes): Exp
   }
 }
 
+// or go all-out and resolve an IP address via string literals (note: don't actually do this)
 def dnsResolveCode(in: Expr[StringContext], args: Expr[Seq[Any]])(using Quotes): Expr[IpAddress] = {
   val context = in.valueOrAbort.parts
   if (context.size != 1) {

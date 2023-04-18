@@ -6,6 +6,7 @@ import java.security.{PrivateKey, PublicKey}
 import java.time.Instant
 import scala.util.Try
 
+// standard macro entry point
 inline def inspect(inline x: Any): Any        = ${ inspectCode('x) }
 inline def inspectRuntime(inline x: Any): Any = ${ inspectCodeRuntime('x) }
 
