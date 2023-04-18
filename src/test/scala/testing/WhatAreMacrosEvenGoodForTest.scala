@@ -10,6 +10,7 @@ class WhatAreMacrosEvenGoodForTest extends AnyFreeSpec with Matchers {
     }
 
     "Will refuse to compile an invalid day" in {
+      // Day.applyMacro(32)
       "Day.applyMacro(32)" shouldNot compile
     }
   }
@@ -20,6 +21,7 @@ class WhatAreMacrosEvenGoodForTest extends AnyFreeSpec with Matchers {
     }
 
     "Will refuse to compile an invalid day" in {
+      // Day.applyInline(32)
       "Day.applyInline(32)" shouldNot compile
     }
   }

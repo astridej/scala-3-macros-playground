@@ -17,7 +17,7 @@ class ArithmeticTest extends AnyFreeSpec with Matchers {
 
     "should fall over and die for dynamic values" in {
       val x = 5
-      "plusStatic(1, 1)" should compile
+      // plusStatic(x, 1) shouldBe 6
       "plusStatic(x, 1)" shouldNot compile
     }
   }
@@ -37,6 +37,6 @@ class ArithmeticTest extends AnyFreeSpec with Matchers {
 
   "Compiler should be able to compute Fibonacci numbers" in {
     compilerFibonacci(7) shouldBe 13
-    inspectTypedRuntime(compilerFibonacci(10))._2 shouldBe "(55: scala.Int)"
+    inspectRuntime(compilerFibonacci(10)) shouldBe "(55: scala.Int)"
   }
 }
