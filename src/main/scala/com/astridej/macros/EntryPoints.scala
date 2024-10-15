@@ -11,19 +11,19 @@ import com.comcast.ip4s.IpAddress
 object EntryPoints {
 
   // standard macro entry point
-  inline def inspect(inline x: Any): Any = ${ inspectCode('x) }
+  inline def inspectPrintDebug(inline x: Any): Any = ${ Inspections.inspectPrintDebug('x) }
 
-  inline def inspectRuntime(inline x: Any): Any = ${ inspectCodeRuntime('x) }
+  inline def inspectReturnExpr(inline x: Any): Any = ${ Inspections.inspectReturnExpr('x) }
 
-  inline def inspectTreeRuntime[T](inline x: T): String = ${ inspectTreeCodeRuntime('x) }
+  inline def inspectReturnTree[T](inline x: T): String = ${ Inspections.inspectReturnTree('x) }
 
-  inline def inspectTypedRuntime[T](inline x: T): (String, String) = ${ inspectTypedCodeRuntime('x) }
+  inline def inspectReturnType[T](inline x: T): (String, String) = ${ Inspections.inspectReturnType('x) }
 
-  inline def plusStatic(inline x: Int, y: Int): Int = ${ plusStaticCode('x, 'y) }
+  inline def plusStatic(inline x: Int, y: Int): Int = ${ Arithmetic.plusStatic('x, 'y) }
 
-  inline def plusDynamic(inline x: Int, y: Int): Int = ${ plusDynamicCode('x, 'y) }
+  inline def plusDynamic(inline x: Int, y: Int): Int = ${ Arithmetic.plusDynamic('x, 'y) }
 
-  inline def compilerFibonacci(inline n: Int): Int = ${ compilerFibonacciCode('n) }
+  inline def compilerFibonacci(inline n: Int): Int = ${ Arithmetic.compilerFibonacci('n) }
 
   inline def buildInfo(): BuildInfo = ${ buildInfoCode() }
 

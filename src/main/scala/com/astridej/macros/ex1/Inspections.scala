@@ -2,17 +2,20 @@ package com.astridej.macros.ex1
 
 import scala.quoted.*
 
-def inspectCode(x: Expr[Any])(using Quotes): Expr[Any] = {
-  println(x.show)
-  x
-}
+object Inspections {
 
-def inspectCodeRuntime(x: Expr[Any])(using Quotes): Expr[String] = Expr(x.show)
+  def inspectPrintDebug(x: Expr[Any])(using Quotes): Expr[Any] = {
+    println(x.show)
+    x
+  }
 
-def inspectTypedCodeRuntime[T](x: Expr[T])(using Type[T], Quotes): Expr[(String, String)] =
-  Expr((Type.show[T], x.show))
+  def inspectReturnExpr(x: Expr[Any])(using Quotes): Expr[String] = Expr(x.show)
 
-def inspectTreeCodeRuntime[T](x: Expr[T])(using Type[T], Quotes): Expr[String] = {
-  import quotes.reflect.*
-  Expr(x.asTerm.show(using Printer.TreeStructure))
+  def inspectReturnType[T](x: Expr[T])(using Type[T], Quotes): Expr[(String, String)] =
+    Expr((Type.show[T], x.show))
+
+  def inspectReturnTree[T](x: Expr[T])(using Type[T], Quotes): Expr[String] = {
+    import quotes.reflect.*
+    Expr(x.asTerm.show(using Printer.TreeStructure))
+  }
 }

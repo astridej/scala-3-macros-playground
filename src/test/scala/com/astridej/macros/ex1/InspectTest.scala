@@ -10,29 +10,29 @@ import com.astridej.macros.EntryPoints.*
 class InspectTest extends AnyFreeSpec with Matchers {
   "Inspecting code should work" in {
     case class Test(value: Int)
-    inspect(15)
-    inspect("Look at me I'm a string!")
-    inspect(23 - 15)
-    inspect {
+    inspectPrintDebug(15)
+    inspectPrintDebug("Look at me I'm a string!")
+    inspectPrintDebug(23 - 15)
+    inspectPrintDebug {
       // chosen to be random by secure dice roll
       def random(): Int = 4
       random()
     }
     val x = 5
-    inspect(x)
-    inspect(Test(42))
+    inspectPrintDebug(x)
+    inspectPrintDebug(Test(42))
   }
 
   "Inspecting code at runtime should work" in {
     case class Test(value: Int)
-    inspectRuntime(15) shouldBe "15"
-    inspectRuntime("Look at me I'm a string!") shouldBe "\"Look at me I\\'m a string!\""
-    inspectRuntime(23 - 15) shouldBe "8" // scala compiler optimization??
+    inspectReturnExpr(15) shouldBe "15"
+    inspectReturnExpr("Look at me I'm a string!") shouldBe "\"Look at me I\\'m a string!\""
+    inspectReturnExpr(23 - 15) shouldBe "8" // scala compiler optimization??
 
     def indirectAddition(a: Int, b: Int): Int = a + b
 
-    inspectRuntime(indirectAddition(1, 1)) shouldBe "indirectAddition(1, 1)"
-    inspectRuntime {
+    inspectReturnExpr(indirectAddition(1, 1)) shouldBe "indirectAddition(1, 1)"
+    inspectReturnExpr {
       // chosen to be random by secure dice roll
       def random(): Int = 4
 
@@ -42,18 +42,18 @@ class InspectTest extends AnyFreeSpec with Matchers {
         |  random()
         |}""".stripMargin
     val x = 5
-    inspectRuntime(x) shouldBe "x"
-    inspectRuntime(Test(42)) shouldBe "Test.apply(42)"
+    inspectReturnExpr(x) shouldBe "x"
+    inspectReturnExpr(Test(42)) shouldBe "Test.apply(42)"
   }
 
   "Getting types for descriptions should work" in {
     case class Test(value: Int)
-    inspectTypedRuntime(15) shouldBe ("scala.Int", "15")
-    inspectTypedRuntime("Look at me I'm a string!") shouldBe ("java.lang.String", "\"Look at me I\\'m a string!\"")
-    inspectTypedRuntime(23 - 15) shouldBe ("scala.Int", "8")
+    inspectReturnType(15) shouldBe ("scala.Int", "15")
+    inspectReturnType("Look at me I'm a string!") shouldBe ("java.lang.String", "\"Look at me I\\'m a string!\"")
+    inspectReturnType(23 - 15) shouldBe ("scala.Int", "8")
     def indirectAddition(a: Int, b: Int): Int = a + b
-    inspectTypedRuntime(indirectAddition(1, 1)) shouldBe ("scala.Int", "indirectAddition(1, 1)")
-    inspectTypedRuntime {
+    inspectReturnType(indirectAddition(1, 1)) shouldBe ("scala.Int", "indirectAddition(1, 1)")
+    inspectReturnType {
       // chosen to be random by secure dice roll
       def random(): Int = 4
       random()
@@ -63,26 +63,26 @@ class InspectTest extends AnyFreeSpec with Matchers {
        |  random()
        |}""".stripMargin)
     val x = 5
-    inspectTypedRuntime(x) shouldBe ("scala.Int", "x")
-    inspectTypedRuntime(Test(42)) shouldBe ("Test", "Test.apply(42)")
+    inspectReturnType(x) shouldBe ("scala.Int", "x")
+    inspectReturnType(Test(42)) shouldBe ("Test", "Test.apply(42)")
   }
 
   "Can check out syntax trees" in {
     case class Test(value: Int)
-    inspectTreeRuntime(15) shouldBe ("Inlined(None, Nil, Literal(IntConstant(15)))")
+    inspectReturnTree(15) shouldBe ("Inlined(None, Nil, Literal(IntConstant(15)))")
 
     def indirectAddition(a: Int, b: Int): Int = a + b
 
-    inspectTreeRuntime(
+    inspectReturnTree(
       indirectAddition(1, 1)
     ) shouldBe ("Inlined(None, Nil, Apply(Ident(\"indirectAddition\"), List(Literal(IntConstant(1)), Literal(IntConstant(1)))))")
     val x = 5
-    inspectTreeRuntime(x) shouldBe ("Inlined(None, Nil, Ident(\"x\"))")
-    inspectTreeRuntime(
+    inspectReturnTree(x) shouldBe ("Inlined(None, Nil, Ident(\"x\"))")
+    inspectReturnTree(
       Test(42)
     ) shouldBe ("Inlined(None, Nil, Apply(Select(Ident(\"Test\"), \"apply\"), List(Literal(IntConstant(42)))))")
 
-    inspectTreeRuntime((x: Test) =>
+    inspectReturnTree((x: Test) =>
       x.value
     ) shouldBe "Inlined(None, Nil, Block(List(DefDef(\"$anonfun\", List(TermParamClause(List(ValDef(\"x\", TypeIdent(\"Test\"), None)))), Inferred(), Some(Select(Ident(\"x\"), \"value\")))), Closure(Ident(\"$anonfun\"), None)))"
   }

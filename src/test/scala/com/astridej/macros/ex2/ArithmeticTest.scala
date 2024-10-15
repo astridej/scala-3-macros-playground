@@ -8,7 +8,7 @@ class ArithmeticTest extends AnyFreeSpec with Matchers {
 
   "Static plus" - {
     "should calculate the value at compile time" in {
-      inspectTypedRuntime(plusStatic(1, 1)) shouldBe ("scala.Int", "(2: scala.Int)")
+      inspectReturnType(plusStatic(1, 1)) shouldBe ("scala.Int", "(2: scala.Int)")
     }
     "should work for static values" in {
       plusStatic(10, 15) shouldBe 25
@@ -38,6 +38,6 @@ class ArithmeticTest extends AnyFreeSpec with Matchers {
 
   "Compiler should be able to compute Fibonacci numbers" in {
     compilerFibonacci(7) shouldBe 13
-    inspectRuntime(compilerFibonacci(10)) shouldBe "(55: scala.Int)"
+    inspectReturnExpr(compilerFibonacci(10)) shouldBe "(55: scala.Int)"
   }
 }
