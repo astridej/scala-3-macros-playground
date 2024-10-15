@@ -43,4 +43,9 @@ class LogicTest extends AnyFreeSpec {
     proposition"$implication => true" shouldBe Implies(Implies(Statement("X"), Statement("Y")), True)
   }
 
+  "Will error when attempting to interpolate something that is not a proposition" in {
+    val x = 5
+    "proposition\"$x\"" shouldNot compile
+  }
+
 }

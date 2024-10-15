@@ -32,9 +32,9 @@ object EntryPoints {
   inline def deriveEqMacro[T]: Eq[T] = ${ Eq.deriveEqMacro[T] }
 
   extension (inline sc: StringContext) {
-    inline def dnsResolve(args: Any*): IpAddress = ${ StringLiterals.dnsResolve('sc, 'args) }
+    inline def productId(inline args: Any*): ProductId = ${ ProductId.stringLiteral('sc, 'args) }
 
-    inline def binary(args: Any*): Int = ${ StringLiterals.binary('sc, 'args) }
+    inline def literallyProductId(inline args: Any*): ProductId = ${ ProductId.LiterallySupport('sc, 'args) }
 
     inline def proposition(inline args: Proposition*): Proposition =
       ${ propositionCode('sc, 'args) }

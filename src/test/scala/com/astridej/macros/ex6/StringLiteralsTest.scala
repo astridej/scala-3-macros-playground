@@ -1,17 +1,19 @@
 package com.astridej.macros.ex6
 
-import com.astridej.macros.EntryPoints.*
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
+import com.astridej.macros.EntryPoints.*
 
 class StringLiteralsTest extends AnyFreeSpec with Matchers {
-  "Can parse a number as binary via string interpolation" in {
-    binary"10001" shouldBe 17
+  "Can parse a product ID via handwritten string literals" in {
+    val productId = productId"1234567A"
+    productId shouldBe ProductId("1234567A").getOrElse(fail("Invalid product ID"))
+    """productId"1234"""" shouldNot compile
   }
 
-  "Can do a DNS lookup at compile time via string interpolation, because why not" in {
-    val address = dnsResolve"google.com"
-    print(address.asIpv4)
+  "Can parse a product ID via literally library" in {
+    val productId = literallyProductId"1234567A"
+    productId shouldBe ProductId("1234567A").getOrElse(fail("Invalid product ID"))
+    """literallyProductId"1234"""" shouldNot compile
   }
-
 }
