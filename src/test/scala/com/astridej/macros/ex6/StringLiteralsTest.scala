@@ -4,7 +4,7 @@ import com.astridej.macros.EntryPoints.*
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
 
-class StringInterpolationTest extends AnyFreeSpec with Matchers {
+class StringLiteralsTest extends AnyFreeSpec with Matchers {
   "Can parse a number as binary via string interpolation" in {
     binary"10001" shouldBe 17
   }
