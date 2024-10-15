@@ -3,10 +3,12 @@ package com.astridej.macros.ex3
 import cats.effect.kernel.Async
 import cats.effect.{IO, Resource}
 import cats.syntax.all.*
+import fs2.io.net.Network
 import org.http4s.circe.CirceEntityDecoder.*
 import org.http4s.circe.CirceInstances.*
 import org.http4s.ember.client.EmberClientBuilder
 import org.http4s.implicits.uri
+import org.typelevel.log4cats.LoggerFactory
 
 import java.util.TimeZone
 import scala.quoted.{Expr, Quotes, ToExpr}
@@ -25,7 +27,7 @@ case class WeatherInfo(high: Int, low: Int, rainChance: Double) {
 
 object WeatherFrog {
   // open-meteo.com offers a free weather api, let's use that
-  def buildOpenMeteo[F[_]: Async]: Resource[F, WeatherFrog[F]] =
+  def buildOpenMeteo[F[_]: Async: Network: LoggerFactory]: Resource[F, WeatherFrog[F]] =
     EmberClientBuilder
       .default[F]
       .build

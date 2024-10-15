@@ -5,6 +5,7 @@ import cats.effect.unsafe.implicits.global
 import org.http4s.circe.CirceEntityDecoder.*
 import org.http4s.circe.CirceInstances.*
 import org.http4s.ember.client.EmberClientBuilder
+import org.typelevel.log4cats.LoggerFactory
 
 import java.io.File
 import java.time.Instant
@@ -21,6 +22,8 @@ object WeatherDependentCompilation {
     override def apply(x: WeatherInfo)(using Quotes): Expr[WeatherInfo] = '{
       WeatherInfo(${ Expr(x.high) }, ${ Expr(x.low) }, ${ Expr(x.rainChance) })
     }
+
+  given LoggerFactory[IO] = org.typelevel.log4cats.noop.NoOpFactory[IO]
 
   def unwiseWeatherFrog()(using quotes: Quotes): Expr[WeatherInfo] = {
     val weatherInfo = WeatherFrog
