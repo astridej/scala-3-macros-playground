@@ -2,13 +2,8 @@ package com.astridej.macros.ex3
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import org.http4s.circe.CirceEntityDecoder.*
-import org.http4s.circe.CirceInstances.*
-import org.http4s.ember.client.EmberClientBuilder
 import org.typelevel.log4cats.LoggerFactory
 
-import java.io.File
-import java.time.Instant
 import java.util.TimeZone
 import scala.quoted.{Expr, Quotes, ToExpr}
 
