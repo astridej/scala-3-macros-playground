@@ -10,8 +10,8 @@ lazy val root = (project in file("."))
   )
 
 // https://mvnrepository.com/artifact/org.scalatest/scalatest
-libraryDependencies += "org.scalatest"  %% "scalatest"      % "3.2.15" % Test
-libraryDependencies += "org.scala-lang" %% "scala3-staging" % scalaVersion.value
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.15" % Test
+//libraryDependencies += "org.scala-lang" %% "scala3-staging" % scalaVersion.value
 // https://mvnrepository.com/artifact/org.scalatest/scalatest-shouldmatchers
 libraryDependencies += "org.scalatest" %% "scalatest-shouldmatchers" % "3.2.15" % Test
 libraryDependencies ++= Seq(

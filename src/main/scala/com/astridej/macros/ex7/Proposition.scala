@@ -2,7 +2,6 @@ package com.astridej.macros.ex7
 
 import cats.syntax.all.*
 
-import scala.quoted.runtime.impl.ExprImpl
 import scala.quoted.{Expr, FromExpr, Quotes}
 
 sealed trait Proposition {
