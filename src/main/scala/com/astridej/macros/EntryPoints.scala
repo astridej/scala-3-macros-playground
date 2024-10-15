@@ -25,9 +25,9 @@ object EntryPoints {
 
   inline def compilerFibonacci(inline n: Int): Int = ${ Arithmetic.compilerFibonacci('n) }
 
-  inline def buildInfo(): BuildInfo = ${ buildInfoCode() }
+  inline def buildInfo(): BuildInfo = ${ BuildInfo.buildInfo() }
 
-  inline def unwiseWeatherFrog: WeatherInfo = ${ unwiseWeatherFrogCode() }
+  inline def unwiseWeatherFrog: WeatherInfo = ${ WeatherDependentCompilation.unwiseWeatherFrog() }
 
   inline def deriveEq[T]: Eq[T] = ${ deriveEqCode[T] }
 

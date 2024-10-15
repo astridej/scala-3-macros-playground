@@ -4,7 +4,7 @@ import com.astridej.macros.EntryPoints.*
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
 
-class WeatherTest extends AnyFreeSpec with Matchers {
+class CompileTimeIOTest extends AnyFreeSpec with Matchers {
   "The unwisest frog" - {
 //    YOU FOOLS
 //    "can return the weather" in {
