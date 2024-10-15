@@ -1,4 +1,4 @@
-package testing
+package com.astridej.macros.ex6
 
 import cats.effect.IO
 import com.comcast.ip4s.IpAddress
@@ -7,8 +7,8 @@ import dotty.tools.dotc.semanticdb.SymbolInformation.Kind.PACKAGE
 import java.io.File
 import java.net.InetAddress
 import java.nio.file.Files
-import java.security.{KeyFactory, PrivateKey, PublicKey}
 import java.security.spec.{RSAPrivateKeySpec, RSAPublicKeySpec}
+import java.security.{KeyFactory, PrivateKey, PublicKey}
 import java.time.Instant
 import scala.quoted.*
 

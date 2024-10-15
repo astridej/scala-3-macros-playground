@@ -1,4 +1,4 @@
-package testing
+package com.astridej.macros.ex1
 
 import scala.quoted.*
 

@@ -1,9 +1,10 @@
-package testing
+package com.astridej.macros.ex3
 
+import com.astridej.macros.EntryPoints.*
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
 
-class SkyIsTheLimitTest extends AnyFreeSpec with Matchers {
+class WeatherTest extends AnyFreeSpec with Matchers {
   "The unwisest frog" - {
 //    YOU FOOLS
 //    "can return the weather" in {

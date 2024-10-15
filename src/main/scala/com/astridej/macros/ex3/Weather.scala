@@ -1,10 +1,10 @@
-package testing
+package com.astridej.macros.ex3
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import org.http4s.ember.client.EmberClientBuilder
-import org.http4s.circe.CirceInstances.*
 import org.http4s.circe.CirceEntityDecoder.*
+import org.http4s.circe.CirceInstances.*
+import org.http4s.ember.client.EmberClientBuilder
 
 import java.io.File
 import java.time.Instant

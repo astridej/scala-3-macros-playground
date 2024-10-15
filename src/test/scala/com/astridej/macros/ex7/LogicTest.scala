@@ -1,5 +1,6 @@
-package logic
+package com.astridej.macros.ex7
 
+import com.astridej.macros.EntryPoints.*
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers.*
 

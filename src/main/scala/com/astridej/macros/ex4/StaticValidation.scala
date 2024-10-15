@@ -1,6 +1,6 @@
-package testing
+package com.astridej.macros.ex4
 
-import scala.quoted.*
+import scala.quoted.{Expr, Quotes}
 
 def dayMacroCode(in: Expr[Int])(using Quotes): Expr[Int] = {
   val value = in.valueOrAbort

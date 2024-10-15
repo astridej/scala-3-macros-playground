@@ -1,4 +1,5 @@
-package logic
+package com.astridej.macros.ex7
+
 import cats.syntax.all.*
 
 import scala.quoted.runtime.impl.ExprImpl

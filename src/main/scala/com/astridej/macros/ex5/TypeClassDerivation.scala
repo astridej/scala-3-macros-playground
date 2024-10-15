@@ -1,4 +1,4 @@
-package testing
+package com.astridej.macros.ex5
 
 import scala.annotation.tailrec
 import scala.compiletime.summonInline
@@ -56,7 +56,7 @@ def deriveEqCode[T: Type](using Quotes): Expr[Eq[T]] = {
 
 // We can also use inline and Mirror to derive Eq instances
 // Significantly simpler and more elegant, and can be shortened even more via Shapeless
-object MirrorUniverse {
+object MirrorDerivation {
   given Eq[EmptyTuple.type] = (_: EmptyTuple.type, _: EmptyTuple.type) => true
 
   given inductionEq[S, T <: Tuple](using sEq: Eq[S], tEq: Eq[T]): Eq[S *: T] = (c: S *: T, d: S *: T) =>
@@ -67,9 +67,8 @@ object MirrorUniverse {
   inline def deriveEqMirrored[T <: Product](
       using mirror: Mirror.ProductOf[T]
   ): Eq[T] = {
-    import testing.MirrorUniverse.given
+    import MirrorDerivation.given
     val derivedEq = summonInline[Eq[mirror.MirroredElemTypes]]
     (s: T, t: T) => derivedEq.areEqual(Tuple.fromProductTyped(s), Tuple.fromProductTyped(t))
   }
-
 }

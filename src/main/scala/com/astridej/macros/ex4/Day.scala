@@ -1,4 +1,4 @@
-package testing
+package com.astridej.macros.ex4
 
 opaque type Day = Int
 

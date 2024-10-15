@@ -1,9 +1,9 @@
-package testing
+package com.astridej.macros.ex4
 
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
 
-class WhatAreMacrosEvenGoodForTest extends AnyFreeSpec with Matchers {
+class StaticValidationTest extends AnyFreeSpec with Matchers {
   "Macro" - {
     "Can create a valid day" in {
       Day.applyMacro(25)

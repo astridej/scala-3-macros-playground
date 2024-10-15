@@ -1,10 +1,11 @@
-package testing
+package com.astridej.macros.ex1
 
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
 
 import java.nio.charset.StandardCharsets
 import javax.crypto.Cipher
+import com.astridej.macros.EntryPoints.*
 
 class InspectTest extends AnyFreeSpec with Matchers {
   "Inspecting code should work" in {

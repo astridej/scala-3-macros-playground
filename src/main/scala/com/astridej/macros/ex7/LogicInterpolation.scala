@@ -1,4 +1,5 @@
-package logic
+package com.astridej.macros.ex7
+
 import cats.syntax.all.*
 
 import scala.quoted.*
@@ -7,6 +8,7 @@ import scala.quoted.*
 def propositionCode(sc: Expr[StringContext], args: Expr[Seq[Proposition]])(using Quotes): Expr[Proposition] = {
   import quoted.quotes.*
   import quotes.reflect.report
+
   def parsePartial(next: List[String | Expr[Proposition]]): Expr[Proposition] =
     next match {
       case Nil                              => report.errorAndAbort("Got empty statement when parsing proposition!")
