@@ -29,7 +29,7 @@ object EntryPoints {
 
   inline def unwiseWeatherFrog: WeatherInfo = ${ WeatherDependentCompilation.unwiseWeatherFrog() }
 
-  inline def deriveEq[T]: Eq[T] = ${ deriveEqCode[T] }
+  inline def deriveEqMacro[T]: Eq[T] = ${ Eq.deriveEqMacro[T] }
 
   extension (inline sc: StringContext) {
     inline def dnsResolve(args: Any*): IpAddress = ${ dnsResolveCode('sc, 'args) }

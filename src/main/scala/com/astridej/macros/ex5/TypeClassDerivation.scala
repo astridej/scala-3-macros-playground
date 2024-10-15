@@ -11,8 +11,10 @@ trait Eq[-C] {
 
 object Eq {
   given numeric[N](using num: Numeric[N]): Eq[N] = (c, d) => num.equiv(c, d)
-  given Eq[String]                               = (c, d) => c == d
-  given Eq[Boolean]                              = (c, d) => c == d
+
+  given Eq[String] = (c, d) => c == d
+
+  given Eq[Boolean] = (c, d) => c == d
 
   given coll[C](using underlying: Eq[C]): Eq[Iterable[C]] = new Eq[Iterable[C]] {
     @tailrec
@@ -22,33 +24,33 @@ object Eq {
       case _                                                               => false
     }
   }
-}
 
-// We can use macros to try to derive an Eq instance for a case class
-// this requires dipping into the reflect API and creating some expressions via the actual syntax trees, which is pretty ugly
-def deriveEqCode[T: Type](using Quotes): Expr[Eq[T]] = {
-  import quotes.reflect.*
-  val sym = TypeRepr.of[T].typeSymbol
-  if (!sym.isClassDef || !sym.flags.is(Flags.Case))
-    quotes.reflect.report.errorAndAbort("Not a case class.")
-  val fieldCheckEqs: List[(Expr[T], Expr[T]) => Expr[Boolean]] = sym.caseFields.map { field =>
-    val fieldType = TypeRepr.of[T].memberType(field)
-    fieldType.asType match {
-      case '[t] =>
-        val eq =
-          Expr.summon[Eq[t]].getOrElse(quotes.reflect.report.errorAndAbort(s"Could not find implicit for field $field"))
-        (s: Expr[T], t: Expr[T]) =>
-          '{ ${ eq }.areEqual(${ Select(s.asTerm, field).asExprOf[t] }, ${ Select(t.asTerm, field).asExprOf[t] }) }
+  // We can use macros to try to derive an Eq instance for a case class
+  // this requires dipping into the reflect API and creating some expressions via the actual syntax trees, which is pretty ugly
+  def deriveEqMacro[T: Type](using Quotes): Expr[Eq[T]] = {
+    import quotes.reflect.*
+    val sym = TypeRepr.of[T].typeSymbol
+    if (!sym.isClassDef || !sym.flags.is(Flags.Case))
+      report.errorAndAbort("Not a case class.")
+    val fieldCheckEqs: List[(Expr[T], Expr[T]) => Expr[Boolean]] = sym.caseFields.map { field =>
+      val fieldType = TypeRepr.of[T].memberType(field)
+      fieldType.asType match {
+        case '[t] =>
+          val eq =
+            Expr.summon[Eq[t]].getOrElse(report.errorAndAbort(s"Could not find implicit for field $field"))
+          (s: Expr[T], t: Expr[T]) =>
+            '{ ${ eq }.areEqual(${ Select(s.asTerm, field).asExprOf[t] }, ${ Select(t.asTerm, field).asExprOf[t] }) }
+      }
     }
-  }
-  '{
-    new Eq[T] {
-      override def areEqual(c: T, d: T): Boolean = ${
-        fieldCheckEqs
-          .map { fn =>
-            fn('c, 'd)
-          }
-          .foldRight('true)((a, b) => '{ $a && $b })
+    '{
+      new Eq[T] {
+        override def areEqual(c: T, d: T): Boolean = ${
+          fieldCheckEqs
+            .map { fn =>
+              fn('c, 'd)
+            }
+            .foldRight('true)((a, b) => '{ $a && $b })
+        }
       }
     }
   }
