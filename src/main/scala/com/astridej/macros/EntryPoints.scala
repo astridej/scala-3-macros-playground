@@ -27,7 +27,7 @@ object EntryPoints {
 
   inline def buildInfo(): BuildInfo = ${ BuildInfo.buildInfo() }
 
-  inline def unwiseWeatherFrog: WeatherInfo = ${ WeatherDependentCompilation.unwiseWeatherFrog() }
+  inline def unwiseWeatherFrog(): WeatherInfo = ${ WeatherDependentCompilation.unwiseWeatherFrog() }
 
   inline def deriveEqMacro[T]: Eq[T] = ${ Eq.deriveEqMacro[T] }
 

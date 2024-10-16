@@ -8,13 +8,14 @@ case class BuildInfo(time: Instant, gitCommit: String)
 
 // a significantly more reasonable example: you could extract build time and git commit hash during compilation
 object BuildInfo {
-  given ToExpr[BuildInfo] = new ToExpr[BuildInfo]:
+  given ToExpr[BuildInfo] = new ToExpr[BuildInfo] {
     override def apply(x: BuildInfo)(using Quotes): Expr[BuildInfo] = '{
       BuildInfo(
         Instant.ofEpochSecond(${ Expr(x.time.getEpochSecond) }, ${ Expr(x.time.getNano) }),
         ${ Expr(x.gitCommit) }
       )
     }
+  }
 
   def buildInfo()(using quotes: Quotes): Expr[BuildInfo] = {
     import sys.process.*

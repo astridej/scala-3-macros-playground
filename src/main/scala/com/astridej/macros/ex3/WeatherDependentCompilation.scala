@@ -2,6 +2,7 @@ package com.astridej.macros.ex3
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
+import org.http4s.ember.client.EmberClientBuilder
 import org.typelevel.log4cats.LoggerFactory
 
 import java.util.TimeZone
@@ -13,18 +14,22 @@ object WeatherDependentCompilation {
 
   // ToExpr typeclass allows "transferring" instances of types between compile-time and runtime
   // by explaining how to construct an expression that will recreate the value
-  given ToExpr[WeatherInfo] = new ToExpr[WeatherInfo]:
+  given ToExpr[WeatherInfo] = new ToExpr[WeatherInfo] {
     override def apply(x: WeatherInfo)(using Quotes): Expr[WeatherInfo] = '{
       WeatherInfo(${ Expr(x.high) }, ${ Expr(x.low) }, ${ Expr(x.rainChance) })
     }
+  }
 
   given LoggerFactory[IO] = org.typelevel.log4cats.noop.NoOpFactory[IO]
 
   def unwiseWeatherFrog()(using quotes: Quotes): Expr[WeatherInfo] = {
-    val weatherInfo = WeatherFrog
-      .buildOpenMeteo[IO]
-      .use { frog =>
-        frog.getTodaysWeather("52.52", "13.41", TimeZone.getTimeZone("Europe/Berlin"))
+    val weatherInfo = EmberClientBuilder
+      .default[IO]
+      .build
+      .use { client =>
+        WeatherFrog
+          .buildOpenMeteo[IO](client)
+          .getTodaysWeather("52.52", "13.41", TimeZone.getTimeZone("Europe/Berlin"))
       }
       .unsafeRunSync() // usually I would say unsafeRunSync is a sign you are doing something wrong, but here there are so many other problems with what we're doing already
 

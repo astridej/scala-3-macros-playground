@@ -25,8 +25,8 @@ object ProductId {
     }
   }
 
-  // ...or we could just use the Literally library designed for this purpose:
   object LiterallySupport extends Literally[ProductId] {
+    // ...or we could just use the Literally library designed for this purpose:
     def validate(s: String)(using Quotes): Either[String, Expr[ProductId]] = ProductId(s).map(Expr(_))
   }
 }

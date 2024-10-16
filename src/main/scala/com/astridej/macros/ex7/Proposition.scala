@@ -2,8 +2,6 @@ package com.astridej.macros.ex7
 
 import cats.syntax.all.*
 
-import scala.quoted.{Expr, FromExpr, Quotes}
-
 sealed trait Proposition {
   def truthValue(atoms: Map[String, Boolean]): Option[Boolean]
 }
@@ -38,8 +36,10 @@ object Proposition {
 
   case class Implies(a: Proposition, b: Proposition) extends Proposition {
     override def truthValue(atoms: Map[String, Boolean]): Option[Boolean] =
-      (a.truthValue(atoms), b.truthValue(atoms)).mapN { (first, second) =>
-        !first || second
+      (a.truthValue(atoms), b.truthValue(atoms)) match {
+        case (Some(false), _)   => Some(true)
+        case (_, Some(boolean)) => Some(boolean)
+        case (_, None)          => None
       }
   }
 }
