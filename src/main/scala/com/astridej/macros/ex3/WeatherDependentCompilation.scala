@@ -29,7 +29,10 @@ object WeatherDependentCompilation {
       .use { client =>
         WeatherFrog
           .buildOpenMeteo[IO](client)
-          .getTodaysWeather("52.52", "13.41", TimeZone.getTimeZone("Europe/Berlin"))
+          // Fort William in Scotland, to make absolutely sure this goes terribly wrong
+          .getTodaysWeather("56.82", "-5.1", TimeZone.getTimeZone("Europe/London"))
+      // Berlin is TOO WARM AND SUNNY what a world
+      // .getTodaysWeather("52.52", "13.41", TimeZone.getTimeZone("Europe/Berlin"))
       }
       .unsafeRunSync() // usually I would say unsafeRunSync is a sign you are doing something wrong, but here there are so many other problems with what we're doing already
 
@@ -39,7 +42,7 @@ object WeatherDependentCompilation {
         Expr(weatherInfo)
       case nonempty =>
         quotes.reflect.report.errorAndAbort(
-          s"The weather is bad because: ${nonempty.mkString("\n", ",\n* ", "\n")}So the compiler is sulking."
+          s"The weather is bad because: ${nonempty.mkString("\n* ", "\n* ", "\n")}So the compiler is sulking."
         )
     }
   }

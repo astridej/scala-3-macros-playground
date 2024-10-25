@@ -6,12 +6,12 @@ import org.scalatest.matchers.should.Matchers
 
 class CompileTimeIOTest extends AnyFreeSpec with Matchers {
   "The unwisest frog" - {
-//    YOU FOOLS
+// //    YOU FOOLS
 //    "can return the weather" in {
-//      unwiseWeatherFrog shouldBe WeatherInfo(17, 12, 0.8d)
+//      unwiseWeatherFrog() shouldBe WeatherInfo(17, 12, 0.8d)
 //    }
     "can check the weather" in {
-      "unwiseWeatherFrog" shouldNot compile
+      "unwiseWeatherFrog()" shouldNot compile
     }
   }
 
