@@ -8,10 +8,13 @@ import scala.util.matching.Regex
 opaque type ProductId = String
 
 object ProductId {
-  private val regex: Regex                            = "^[a-zA-Z0-9]{8}$".r
-  def apply(value: String): Either[String, ProductId] = Either.cond(regex.matches(value), value, "Invalid ProductId")
+  private val regex: Regex = "^[a-zA-Z0-9]{8}$".r
+  def apply(value: String): Either[String, ProductId] =
+    Either.cond(regex.matches(value), value, "Invalid ProductId")
 
-  def stringLiteral(in: Expr[StringContext], args: Expr[Seq[Any]])(using Quotes): Expr[ProductId] = {
+  def stringLiteral(in: Expr[StringContext], args: Expr[Seq[Any]])(
+      using Quotes
+  ): Expr[ProductId] = {
     import quoted.quotes.*
     val context = in.valueOrAbort.parts
     if (context.size != 1) {
@@ -27,6 +30,7 @@ object ProductId {
 
   object LiterallySupport extends Literally[ProductId] {
     // ...or we could just use the Literally library designed for this purpose:
-    def validate(s: String)(using Quotes): Either[String, Expr[ProductId]] = ProductId(s).map(Expr(_))
+    def validate(s: String)(using Quotes): Either[String, Expr[ProductId]] =
+      ProductId(s).map(Expr(_))
   }
 }

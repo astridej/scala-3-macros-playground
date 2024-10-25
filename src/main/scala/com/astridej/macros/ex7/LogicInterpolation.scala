@@ -5,13 +5,16 @@ import cats.syntax.all.*
 import scala.quoted.*
 
 // Example of a custom string literal that supports interpolation: let's try to parse first-order propositional logic
-def propositionCode(sc: Expr[StringContext], args: Expr[Seq[Proposition]])(using Quotes): Expr[Proposition] = {
+def propositionCode(sc: Expr[StringContext], args: Expr[Seq[Proposition]])(
+    using Quotes
+): Expr[Proposition] = {
   import quoted.quotes.*
   import quotes.reflect.report
 
   def parsePartial(next: List[String | Expr[Proposition]]): Expr[Proposition] =
     next match {
-      case Nil                              => report.errorAndAbort("Got empty statement when parsing proposition!")
+      case Nil =>
+        report.errorAndAbort("Got empty statement when parsing proposition!")
       case (expr: Expr[Proposition]) :: Nil => expr
       case (expr: Expr[Proposition]) :: ("&&" | "AND") :: tail =>
         '{ Proposition.And(${ expr }, ${ parsePartial(tail) }) }
@@ -30,20 +33,28 @@ def propositionCode(sc: Expr[StringContext], args: Expr[Seq[Proposition]])(using
           }
           .indexOf(")" -> 0)
         if (indexOfCloser <= 0)
-          report.errorAndAbort(s"Opening bracket without closing bracket when parsing $next.")
+          report.errorAndAbort(
+            s"Opening bracket without closing bracket when parsing $next."
+          )
         else {
           val toExpr = tail.slice(0, indexOfCloser - 1)
           parsePartial(parsePartial(toExpr) :: tail.drop(indexOfCloser))
         }
 
-      case "TRUE" :: tail                 => parsePartial('{ Proposition.True } :: tail)
-      case "FALSE" :: tail                => parsePartial('{ Proposition.False } :: tail)
-      case ("!" | "NOT") :: tail          => '{ Proposition.Not(${ parsePartial(tail) }) }
-      case ("&&" | "AND") :: _            => report.errorAndAbort("AND statement without preceding statement!")
-      case ("||" | "OR") :: _             => report.errorAndAbort("OR statement without preceding statement!")
-      case ("->" | "=>" | "IMPLIES") :: _ => report.errorAndAbort("IMPLIES statement without preceding statement!")
-      case ")" :: _                       => report.errorAndAbort("Closing bracket without opening bracket!")
-      case (raw: String) :: tail          => parsePartial('{ Proposition.Statement(${ Expr(raw) }) } :: tail)
+      case "TRUE" :: tail  => parsePartial('{ Proposition.True } :: tail)
+      case "FALSE" :: tail => parsePartial('{ Proposition.False } :: tail)
+      case ("!" | "NOT") :: tail =>
+        '{ Proposition.Not(${ parsePartial(tail) }) }
+      case ("&&" | "AND") :: _ =>
+        report.errorAndAbort("AND statement without preceding statement!")
+      case ("||" | "OR") :: _ =>
+        report.errorAndAbort("OR statement without preceding statement!")
+      case ("->" | "=>" | "IMPLIES") :: _ =>
+        report.errorAndAbort("IMPLIES statement without preceding statement!")
+      case ")" :: _ =>
+        report.errorAndAbort("Closing bracket without opening bracket!")
+      case (raw: String) :: tail =>
+        parsePartial('{ Proposition.Statement(${ Expr(raw) }) } :: tail)
     }
 
   val context = sc.valueOrAbort

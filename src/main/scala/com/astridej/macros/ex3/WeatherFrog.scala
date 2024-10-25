@@ -10,13 +10,21 @@ import org.http4s.implicits.uri
 import java.util.TimeZone
 
 trait WeatherFrog[F[_]] {
-  def getTodaysWeather(latitude: String, longitude: String, tz: TimeZone): F[WeatherInfo]
+  def getTodaysWeather(
+      latitude: String,
+      longitude: String,
+      tz: TimeZone
+  ): F[WeatherInfo]
 }
 
 case class WeatherInfo(high: Int, low: Int, rainChance: Double) {
   def complaint: List[String] = List(
-    Option.when(high < 18)("Weather is too cold."), // 64 Fahrenheit for the Fahrenheit-users among us
-    Option.when(high > 30)("Weather is too hot."),  // 86 Fahrenheit for the Fahrenheit-users among us
+    Option.when(high < 18)(
+      "Weather is too cold."
+    ), // 64 Fahrenheit for the Fahrenheit-users among us
+    Option.when(high > 30)(
+      "Weather is too hot."
+    ), // 86 Fahrenheit for the Fahrenheit-users among us
     Option.when(rainChance > 0.5)("It's going to rain :(")
   ).flatten
 }
@@ -30,8 +38,8 @@ object WeatherFrog {
           Map(
             "latitude"  -> latitude,
             "longitude" -> longitude,
-            "daily"     -> "weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max",
-            "timezone"  -> tz.getID
+            "daily" -> "weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max",
+            "timezone" -> tz.getID
           )
         )
       client
@@ -48,7 +56,8 @@ case class OpenMetoDailyResponse(
     precipitation_probability_max: List[Int]
 ) derives io.circe.Codec.AsObject
 
-case class OpenMeteoResponse(daily: OpenMetoDailyResponse) derives io.circe.Codec.AsObject {
+case class OpenMeteoResponse(daily: OpenMetoDailyResponse)
+    derives io.circe.Codec.AsObject {
   def toWeatherInfo: WeatherInfo = WeatherInfo(
     daily.temperature_2m_max.head.toInt,
     daily.temperature_2m_min.head.toInt,

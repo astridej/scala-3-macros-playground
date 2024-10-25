@@ -9,7 +9,9 @@ object Arithmetic {
 
   // do addition at runtime - works with dynamic x and y
   // (but you don't actually need a macro for this, you could just write x + y...)
-  def plusDynamic(x: Expr[Int], y: Expr[Int])(using Quotes): Expr[Int] = '{ $x + $y }
+  def plusDynamic(x: Expr[Int], y: Expr[Int])(using Quotes): Expr[Int] = '{
+    $x + $y
+  }
 
   // testing: can we use recursive functions in macros? yes!
   // (is computing a fibonacci number this way a good idea? no.)

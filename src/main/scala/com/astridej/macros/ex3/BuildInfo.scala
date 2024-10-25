@@ -11,7 +11,10 @@ object BuildInfo {
   given ToExpr[BuildInfo] = new ToExpr[BuildInfo] {
     override def apply(x: BuildInfo)(using Quotes): Expr[BuildInfo] = '{
       BuildInfo(
-        Instant.ofEpochSecond(${ Expr(x.time.getEpochSecond) }, ${ Expr(x.time.getNano) }),
+        Instant.ofEpochSecond(
+          ${ Expr(x.time.getEpochSecond) },
+          ${ Expr(x.time.getNano) }
+        ),
         ${ Expr(x.gitCommit) }
       )
     }
@@ -19,9 +22,13 @@ object BuildInfo {
 
   def buildInfo()(using quotes: Quotes): Expr[BuildInfo] = {
     import sys.process.*
-    val now                 = Instant.now()
-    val currentFileLocation = quotes.reflect.Position.ofMacroExpansion.sourceFile.jpath
-    val process = Process("git rev-parse HEAD", new File(currentFileLocation.getParent().toAbsolutePath().toString))
+    val now = Instant.now()
+    val currentFileLocation =
+      quotes.reflect.Position.ofMacroExpansion.sourceFile.jpath
+    val process = Process(
+      "git rev-parse HEAD",
+      new File(currentFileLocation.getParent().toAbsolutePath().toString)
+    )
     Expr(BuildInfo(now, process.!!))
   }
 }

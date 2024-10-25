@@ -29,8 +29,13 @@ object WeatherDependentCompilation {
       .use { client =>
         WeatherFrog
           .buildOpenMeteo[IO](client)
-          // Fort William in Scotland, to make absolutely sure this goes terribly wrong
-          .getTodaysWeather("56.82", "-5.1", TimeZone.getTimeZone("Europe/London"))
+          // Fort William in Scotland
+          // (to make absolutely sure this goes terribly wrong)
+          .getTodaysWeather(
+            "56.82",
+            "-5.1",
+            TimeZone.getTimeZone("Europe/London")
+          )
       // Berlin is TOO WARM AND SUNNY what a world
       // .getTodaysWeather("52.52", "13.41", TimeZone.getTimeZone("Europe/Berlin"))
       }
